@@ -4,12 +4,12 @@ const db = require("./database");
 
 
 
-// http://localhost:3000/api/vehicle
+// http://localhost:3000/api/user
 
 //To get all data in the table
-router.get('/vehicles', async (req, res) =>{
+router.get('/users', async (req, res) =>{
   try {
-    const ids = await db('vehicle').select("*");
+    const ids = await db('user').select("*");
     res.status(201).json(ids);
   } catch (err) {
     res.status(500).json({message: "Error getting data", error: err})
@@ -18,10 +18,10 @@ router.get('/vehicles', async (req, res) =>{
 
   
 // To get data with specific id  
-router.get('/vehicles/:id',  async (req, res) =>{
-  const {id} = req.params;
+router.get('/users/:user_id',  async (req, res) =>{
+  const {user_id} = req.params;
       try {
-          await db('vehicle').where({id}).select().then((data)=>{  
+          await db('user').where({user_id}).select().then((data)=>{  
             res.send(data);    
         })
       }
@@ -33,11 +33,11 @@ router.get('/vehicles/:id',  async (req, res) =>{
  
 
 // To post data in the table
-  router.post('/vehicles',  async (req, res) =>{
+  router.post('/users',  async (req, res) =>{
 
   const postData = req.body;
   try {
-    await db('vehicle').insert(postData);
+    await db('users').insert(postData);
     res.status(201).json(postData);
   } catch (err) {
        res.status(500).json({message: "Error creating new post", error: err})  
@@ -48,10 +48,10 @@ router.get('/vehicles/:id',  async (req, res) =>{
 
 
 // To delete data from the table with specific id
-router.delete('/vehicles/:id', async (req, res) =>{
-  const {id} = req.params;
+router.delete('/users/:user_id', async (req, res) =>{
+  const {user_id} = req.params;
   try {
-    const count = await db('vehicle').where({ id}).del();
+    const count = await db('user').where({user_id}).del();
     if (count) {
       res.json({message:"Data successfully deleted"});
     } else {
@@ -68,13 +68,13 @@ router.delete('/vehicles/:id', async (req, res) =>{
 
 
 // To update data
-  router.put('/vehicles/:id',  async (req, res) =>{
-    const {id} = req.params;
+  router.put('/users/:user_id',  async (req, res) =>{
+    const {user_id} = req.params;
     const changes = req.body;
     try {
-      const count = await db('vehicle').where({id}).update(changes);
+      const count = await db('user').where({user_id}).update(changes);
       if (count) {
-        const ids = await db('vehicle').select('*').where("id",id);
+        const ids = await db('user').select('*').where("user_id",user_id);
         res.status(200).json({ids})
       } else {
         res.status(404).json({message: "Record not found"})
