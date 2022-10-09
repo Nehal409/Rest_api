@@ -1,8 +1,11 @@
 const router = require("express").Router();
 const mysql2 = require("mysql2");
-const db = require("./database");
+const db = require("../db/database");
 
-
+function isValidId(req, res, next) {
+  if(!isNaN(req.params.contact_id)) return next();
+  next(new Error('Invalid ID'));
+}
 
 // http://localhost:3000/api/contacts
 
@@ -10,7 +13,7 @@ const db = require("./database");
 router.get('/contacts', async (req, res) =>{
   try {
     const ids = await db('customer_contact').select("*");
-    res.status(201).json(ids);
+    res.status(200).json(ids);
   } catch (err) {
     res.status(500).json({message: "Error getting data", error: err})
   }
@@ -18,11 +21,11 @@ router.get('/contacts', async (req, res) =>{
 
   
 // To get data with specific id  
-router.get('/contacts/:contact_id',  async (req, res) =>{
+router.get('/contacts/:contact_id',isValidId,  async (req, res) =>{
   const {contact_id} = req.params;
       try {
           await db('customer_contact').where({contact_id}).select().then((data)=>{  
-            res.send(data);    
+             res.status(200).json(data);
         })
       }
          catch (err) {
@@ -38,7 +41,7 @@ router.get('/contacts/:contact_id',  async (req, res) =>{
   const postData = req.body;
   try {
     await db('customer_contact').insert(postData);
-    res.status(201).json(postData);
+       res.status(200).json(postData);
   } catch (err) {
        res.status(500).json({message: "Error creating new post", error: err})  
   } 
@@ -48,14 +51,16 @@ router.get('/contacts/:contact_id',  async (req, res) =>{
 
 
 // To delete data from the table with specific id
-router.delete('/contacts/:contact_id', async (req, res) =>{
+router.delete('/contacts/:contact_id',isValidId, async (req, res) =>{
   const {contact_id} = req.params;
   try {
     const count = await db('customer_contact').where({contact_id}).del();
-    if (count) {
-      res.json({message:"Data successfully deleted"});
-    } else {
+    if (!count) {
       res.status(404).json({message: "Record not found"})
+    }
+    else 
+    {
+      res.json({message:"Data successfully deleted"}); 
     }  
   }
      catch (err) {
@@ -68,18 +73,24 @@ router.delete('/contacts/:contact_id', async (req, res) =>{
 
 
 // To update data
-  router.put('/contacts/:contact_id',  async (req, res) =>{
+  router.put('/contacts/:contact_id', isValidId, async (req, res) =>{
     const {contact_id} = req.params;
     const changes = req.body;
     try {
       const count = await db('customer_contact').where({contact_id}).update(changes);
-      if (count) {
-        const ids = await db('customer_contact').select('*').where("contact_id",contact_id);
-        res.status(200).json({ids})
-      } else {
+      if (!count)
+      {
         res.status(404).json({message: "Record not found"})
+      } 
+      else 
+      {
+        await db('customer_contact').select().where("contact_id",contact_id).then((data)=>{
+          res.status(201).json({data})
+        });
+       
       }
-    } catch (err) {
+      }
+      catch (err) {
       res.status(500).json({message: "Error updating new post", error: err})
     }
   });
