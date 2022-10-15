@@ -1,6 +1,9 @@
 const Router = require('koa-router');
 const Koa = require("koa");
 const inventory_query = require("../repositry/inventory_repo")
+const homePagination_query = require("../repositry/homePagination")
+
+
 
 const app = new Koa();
 
@@ -13,6 +16,10 @@ function isValidId(ctx, next) {
 	next(new Error('Invalid ID'));
   }
 
+
+
+// For Home Pae
+router.get('/home',homePagination_query.homePage)
 
 // To get data   
 router.get('/',inventory_query.getAll)
@@ -32,7 +39,7 @@ router.delete('/:item_id', isValidId, inventory_query.deleteData);
 
 // To update data
 router.put('/:item_id', isValidId,inventory_query.updateData );
-  
+
 
 module.exports = router;
 

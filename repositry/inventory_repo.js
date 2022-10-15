@@ -1,5 +1,7 @@
 const db = require("../db/database");
 
+
+
 exports.getAll = async (ctx) => {
     try {
        await db('inventory').select().then((data)=>{

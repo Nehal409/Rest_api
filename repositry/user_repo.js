@@ -1,8 +1,18 @@
+require("dotenv").config()
+
+
 const db = require("../db/database");
 const bcrypt = require("bcrypt");
 const Koa = require("koa");
 const json = require("koa-json");
 const koaBody = require('koa-body');
+const jwt = require("jsonwebtoken");
+
+
+
+
+
+
 
 
 
@@ -11,6 +21,8 @@ const app = new Koa();
 // middleware functions
 app.use(koaBody());
 app.use(json());
+
+
 
 
 exports.getAll = async (ctx) => {
@@ -27,7 +39,7 @@ exports.getAll = async (ctx) => {
 }
 
 
-
+ 
 exports.signup = async (ctx) =>{
     
   try {
@@ -39,28 +51,37 @@ exports.signup = async (ctx) =>{
       email:email,
       password:hash,
       phone:phone 
-      }).then(()=>{
+      })
+      // const token = jwt.sign({email:email}, process.env.JWT_SECRET,{expiresIn: '30s' })
       ctx.response.status = 200;
       ctx.body={message:"Signup Successful"} 
-      })
+      
 // For duplicate entry
   } catch (err) {
       ctx.response.status = 400;
 			ctx.body = {      message: "User already exist"      };  
   }  
- }
+ }   
 
 
- 
+
+
  exports.login = async (ctx) =>{
     try{
-      const {name,email,password,phone} = ctx.request.body;
+      const {email,password} = ctx.request.body;
       const user = await db('user').first("*").where({email:email});
       if(user){
         const validPass = await bcrypt.compare(password, user.password);
         if(validPass){
+
+     // Generating JWT
+     // 1- Gets us access to user
+     // 2- secret token
+     // 3- expiration date which we have not used here
+          const token = jwt.sign({email:email}, process.env.JWT_SECRET,{expiresIn: '1200s' })
+
           ctx.response.status = 200;
-          ctx.body={ message:"valid email and password!" };
+          ctx.body={ message:"valid email and password!",token:token };
         }
         else{
           ctx.body={ message:"invalid password!" };
@@ -78,6 +99,17 @@ exports.signup = async (ctx) =>{
       }  
  
  }
+
+
+
+
+
+ exports.home = async (ctx) =>{
+  ctx.body={ message:"Thid is home page" }
+ }
+
+
+
 
 
 
@@ -100,18 +132,18 @@ exports.getById = async (ctx) =>{
 
 
 
-exports.postdata = async (ctx) =>{
+// exports.postdata = async (ctx) =>{
 
-    const postData = ctx.request.body;
-    try {
-      await db('user').insert(postData).then(()=>{  
-        ctx.response.status = 200;
-        ctx.body={ json: postData }
-     })  
-    } catch (err) {
-        ctx.response.status = 500;
-        ctx.body = {      message: err.message       }; 		} 
-}
+//     const postData = ctx.request.body;
+//     try {
+//       await db('user').insert(postData).then(()=>{  
+//         ctx.response.status = 200;
+//         ctx.body={ json: postData }
+//      })  
+//     } catch (err) {
+//         ctx.response.status = 500;
+//         ctx.body = {      message: err.message       }; 		} 
+// }
 
 
 

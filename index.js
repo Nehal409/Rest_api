@@ -31,10 +31,13 @@ app.use(dealerkoa.routes()).use(dealerkoa.allowedMethods());
 app.use(customerContactkoa.routes()).use(customerContactkoa.allowedMethods());
 
 
+app.use(function errorHandler(err,ctx,next){
+    ctx.status = 500;
+    ctx.body = {      message: 'Something Broke!'       }; 
+})
 
 
-
-const port = process.env.PORT || 3000;
+const port = process.env.port;
 app.listen(port, ()=> console.log("Port is " + port));
 
 
