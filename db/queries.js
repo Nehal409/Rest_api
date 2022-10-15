@@ -9,7 +9,6 @@ module.exports = {
           knexQuery.where('make', 'like', `%${query.make}%`);
         }
         if(query.model) {
-           
           knexQuery.where('model', 'like', `%${query.model}%`);
         }
   

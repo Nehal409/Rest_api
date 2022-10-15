@@ -6,7 +6,7 @@ const db = require('knex')({
       port : 3306,
       user : 'root',
       password : '',
-      database : 'car-dealership'
+      database : 'car_dealership'
     }
   });
 
