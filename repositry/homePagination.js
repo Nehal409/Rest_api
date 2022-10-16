@@ -46,7 +46,7 @@ exports.homePage = async (ctx) => {
 try{
 
 results.results = await db('inventory')
-.join('vehicle', 'vehicle.id', 'inventory.id')
+.innerJoin('vehicle', 'vehicle.id', 'inventory.id')
 .select('vehicle.name', 'vehicle.Price')
 .orderBy("item_id").limit(limit).offset(startIndex)
 ctx.response.status = 200;

@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const Koa = require("koa");
 const inventory_query = require("../repositry/inventory_repo")
 const homePagination_query = require("../repositry/homePagination")
+const purchaseNow = require('../repositry/puchaseNow');
 
 
 
@@ -21,12 +22,17 @@ function isValidId(ctx, next) {
 // For Home Pae
 router.get('/home',homePagination_query.homePage)
 
+
+// For purchase now page details
+router.get('/purchases/:item_id',purchaseNow.purchaseDetails)
+
+
 // To get data   
 router.get('/',inventory_query.getAll)
 
 
 // To get data with specific id  
-router.get('/:item_id', isValidId,inventory_query.getById);
+router.get('/:item_id', isValidId,inventory_query.getInventoryForCars);
 
 
 // To post data in the table

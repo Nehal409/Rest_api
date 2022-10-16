@@ -9,13 +9,6 @@ const koaBody = require('koa-body');
 const jwt = require("jsonwebtoken");
 
 
-
-
-
-
-
-
-
 const app = new Koa();
 
 // middleware functions
@@ -68,7 +61,7 @@ exports.signup = async (ctx) =>{
 
  exports.login = async (ctx) =>{
     try{
-      const {email,password} = ctx.request.body;
+      const {email,password,user_id} = ctx.request.body;
       const user = await db('user').first("*").where({email:email});
       if(user){
         const validPass = await bcrypt.compare(password, user.password);
@@ -78,7 +71,8 @@ exports.signup = async (ctx) =>{
      // 1- Gets us access to user
      // 2- secret token
      // 3- expiration date which we have not used here
-          const token = jwt.sign({email:email}, process.env.JWT_SECRET,{expiresIn: '1200s' })
+          const token = jwt.sign({email:email,user_id:user_id}, process.env.JWT_SECRET,
+            {expiresIn: '1200s' })
 
           ctx.response.status = 200;
           ctx.body={ message:"valid email and password!",token:token };
@@ -101,15 +95,11 @@ exports.signup = async (ctx) =>{
  }
 
 
-
-
+ 
 
  exports.home = async (ctx) =>{
   ctx.body={ message:"Thid is home page" }
  }
-
-
-
 
 
 

@@ -1,6 +1,11 @@
 const db = require("../db/database");
 
 
+// car specs and features
+
+
+
+
 
 exports.getAll = async (ctx) => {
     try {
@@ -19,11 +24,17 @@ exports.getAll = async (ctx) => {
 
 
 
-exports.getById =  async (ctx) =>{
+exports.getInventoryForCars =  async (ctx) =>{
 	const {item_id} = ctx.params;
 		try {
-			await db('inventory').where({item_id}).select().then((data)=>{  
-			       ctx.response.status = 200;
+			await db('inventory as i')
+            .innerJoin('vehicle as v', 'v.id', 'i.id')
+			.innerJoin('dealer as d', 'd.dealer_id', 'i.dealer_id')
+            .select('v.make', 'v.model','v.name','v.status',
+			'v.engine_type','v.engine_capacity','v.img_url',
+			'v.transmission','i.color','i.mileage','d.company_name')
+            .where({item_id}).then((data)=>{  
+			 ctx.response.status = 200;
              ctx.body={ json: data }
 		  })
 		}
@@ -32,6 +43,10 @@ exports.getById =  async (ctx) =>{
 			ctx.body = {      message: err.message       };  
 		}
 }
+
+
+
+
 
 
 

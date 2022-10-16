@@ -17,19 +17,19 @@ exports.getAll = async (ctx) => {
 
 
 
-exports.getById =  async (ctx) =>{
-	const {contact_id} = ctx.params;
-		try {
-			await db('customer_contact').where({contact_id}).select().then((data)=>{  
-			       ctx.response.status = 200;
-             ctx.body={ json: data }
-		  })
-		}
-		   catch (err) {
-			ctx.response.status = 500;
-			ctx.body = {      message: err.message       };  
-		}
-	 }
+// exports.getById =  async (ctx) =>{
+// 	const {contact_id} = ctx.params;
+// 		try {
+// 			await db('customer_contact').where({contact_id}).select().then((data)=>{  
+// 			       ctx.response.status = 200;
+//              ctx.body={ json: data }
+// 		  })
+// 		}
+// 		   catch (err) {
+// 			ctx.response.status = 500;
+// 			ctx.body = {      message: err.message       };  
+// 		}
+// 	 }
 
 
 
@@ -41,7 +41,7 @@ exports.postdata =   async (ctx) =>{
     try {
       await db('customer_contact').insert(postData).then(()=>{  
         ctx.response.status = 200;
-        ctx.body={ json: postData }
+        ctx.body={ json: "Your request have been registered" }
      })  
     } catch (err) {
         ctx.response.status = 500;
@@ -52,47 +52,47 @@ exports.postdata =   async (ctx) =>{
 
 
 
-exports.deleteData = async (ctx) =>{
-	const {contact_id} = ctx.params;
-	try {
-	  const count = await db('customer_contact').where({contact_id}).del();
-	    if (!count) {
-		    ctx.response.status = 404;
-			ctx.body={ message: "Record not found"}
+// exports.deleteData = async (ctx) =>{
+// 	const {contact_id} = ctx.params;
+// 	try {
+// 	  const count = await db('customer_contact').where({contact_id}).del();
+// 	    if (!count) {
+// 		    ctx.response.status = 404;
+// 			ctx.body={ message: "Record not found"}
 		     
-	  } else {
-		    ctx.response.status = 200;
-			ctx.body={message:"Data successfully deleted"} 
-	  }  
-	}
-	catch (err) {
-		ctx.response.status = 500;
-		ctx.body = {      message: err.message       }; 		
-	}
-  }
+// 	  } else {
+// 		    ctx.response.status = 200;
+// 			ctx.body={message:"Data successfully deleted"} 
+// 	  }  
+// 	}
+// 	catch (err) {
+// 		ctx.response.status = 500;
+// 		ctx.body = {      message: err.message       }; 		
+// 	}
+//   }
 
 
 
 
-exports.updateData =  async (ctx) =>{
-    const {contact_id} = ctx.params;
-    const changes = ctx.request.body;
-    try {
-      const count = await db('customer_contact').where({contact_id}).update(changes);
-        if (!count) {
-			ctx.response.status = 404;
-			ctx.body={ message: "Record not found"}	
+// exports.updateData =  async (ctx) =>{
+//     const {contact_id} = ctx.params;
+//     const changes = ctx.request.body;
+//     try {
+//       const count = await db('customer_contact').where({contact_id}).update(changes);
+//         if (!count) {
+// 			ctx.response.status = 404;
+// 			ctx.body={ message: "Record not found"}	
         
-      } else {
-        await db('customer_contact').select('*').where("contact_id",contact_id).then((data)=>{
-			ctx.response.status = 201;
-			ctx.body={json:data} 
+//       } else {
+//         await db('customer_contact').select('*').where("contact_id",contact_id).then((data)=>{
+// 			ctx.response.status = 201;
+// 			ctx.body={json:data} 
          
-        });
-      }
-    } 
-    catch (err) {
-		ctx.response.status = 500;
-		ctx.body = {      message: err.message       }; 	
-    }
-  }
+//         });
+//       }
+//     } 
+//     catch (err) {
+// 		ctx.response.status = 500;
+// 		ctx.body = {      message: err.message       }; 	
+//     }
+//   }
