@@ -31,7 +31,7 @@ router.get('/purchases/:item_id',purchaseNow.purchaseDetails)
 router.get('/',inventory_query.getAll)
 
 
-// To get data with specific id  
+// To get data with specific id  in  vehicle specs and features
 router.get('/:item_id', isValidId,inventory_query.getInventoryForCars);
 
 

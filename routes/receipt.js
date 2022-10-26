@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const Koa = require("koa");
 const receipt_query = require("../repositry/receipt_repo")
+const user_query = require("../repositry/user_repo")
 const app = new Koa();
 
 
@@ -13,6 +14,10 @@ function isValidId(ctx, next) {
 	if(!isNaN(ctx.params.receipt_number)) return next();
 	next(new Error('Invalid ID'));
   }
+
+
+
+
 
 
 // To get data   
@@ -32,8 +37,8 @@ router.delete('/:receipt_number', isValidId,receipt_query.deleteData );
 
 
 
-  // To update data
-  router.put('/:receipt_number', isValidId,receipt_query.updateData);
+// To update data
+router.put('/:receipt_number', isValidId,receipt_query.updateData);
   
 
 module.exports = router;

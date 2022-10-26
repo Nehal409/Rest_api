@@ -1,12 +1,28 @@
+require("dotenv").config()
+
 const Router = require('koa-router');
+// const Koa = require("koa");
+// const user_query = require("../repositry/user_repo")
+
+// const app = new Koa();
+
+
+
+
+const db = require("../db/database");
+const bcrypt = require("bcrypt");
 const Koa = require("koa");
-const user_query = require("../repositry/user_repo")
+const json = require("koa-json");
+const koaBody = require('koa-body');
+const jwt = require("jsonwebtoken");
 
-
-// Middleware
-const jwtauth = require('../authentication/jwtAuth');
 
 const app = new Koa();
+
+// middleware functions
+app.use(koaBody());
+app.use(json());
+
 
 const router = new Router({	prefix: '/users'});
 app.use(router.routes()).use(router.allowedMethods());
@@ -18,24 +34,222 @@ function isValidId(ctx, next) {
 	next(new Error('Invalid ID'));
   }
 
-// To get data   
-router.get('/',user_query.getAll)
+
+function  headerauth (ctx,next){  
+// access the authorization header
+const authHeader = ctx.get('Authorization');
+const token = authHeader && authHeader.split(' ')[1];    
+if(token === null || typeof(token) === "undefined"){
+	//tell the user you do not have access
+	 ctx.response.status = 401;
+	 ctx.body = {      message: "Unauthorized Access"   }; 
+}
+
+//if token is not null then
+jwt.verify(token, process.env.JWT_SECRET, (error, user) =>{
+	if(error) {
+		ctx.response.status = 403;
+		ctx.body = {      message: "Forbidden Access:Token Expired"   }; 
+	}
+
+	//if the user is verified get user id
+	ctx.user = user.user_id;
+	next(); //move on
+});
+
+}
+// home page
+router.get('/vehicles',   async (ctx) => { 
+try {
+	const limit = parseInt(ctx.query.limit)
+	await db('vehicle').select("name","Price","img_url").limit(limit).then((data)=>{
+	ctx.response.status = 200;
+	 ctx.body={ json: data }
+	//  console.log(data)
+ })
+ } 
+ catch (err) {
+	 ctx.response.status = 500;
+	 ctx.body = {      message: err.message       };  
+			 }
+			})
+
+
+			
+
+			
+// api to get vehicle price,dealer for that vehicle and inventory id to post in receipt table
+async function getDetails (ctx,next){
+	const {item_id} = ctx.params;
+		try {
+			await db('inventory as i')
+			.innerJoin('dealer as d', 'd.dealer_id', 'i.dealer_id')
+			.innerJoin('vehicle as v', 'v.id', 'i.id')
+            .select('i.item_id','d.dealer_id','v.Price')
+            .where({item_id}).then((data)=>{  
+			 ctx.response.status = 200;
+             ctx.data = data
+			 next()
+		  })
+		}
+		   catch (err) {
+			ctx.response.status = 500;
+			ctx.body = {      message: err.message       };  
+		}
+}
+
+//
+router.post('/completeOrder/:item_id', getDetails, headerauth, async (ctx) =>{
+	try{
+		const {method} = ctx.request.body;
+        if(!ctx.user){
+			ctx.response.status = 403;
+		    ctx.body = {      message: "You donot have access"    }; 
+            
+        }else{
+			 await db('receipt').insert({
+				unit_price:ctx.data[0].Price,
+				method:method,
+				dealer_id:ctx.data[0].dealer_id,
+				inventory_id:ctx.data[0].item_id,
+				user_id:ctx.user
+				}).then(()=>{
+					ctx.response.status = 200;
+					ctx.body = { message: "Order has been completed"}
+				})
+			//  ctx.body = {      message: "This is home page" ,  
+			//  user:ctx.user.user_id, message: ctx.data[0]  }; 		
+        }
+    }catch(error){
+        ctx.response.status = 500;
+		ctx.body = {      message: error.message   }; 
+    }	
+})
+
+
+
+
+
+
+// get all users
+router.get('/', async (ctx) => {
+    try {
+       await db('user').select().then((data)=>{
+       ctx.response.status = 200;
+        ctx.body={ json: data }
+
+		
+	})
+    } 
+    catch (err) {
+        ctx.response.status = 500;
+        ctx.body = {      message: err.message       };  
+                }
+})
+
+
+
+
 
 // For signup 
 // http://localhost:3000/users/signup
-router.post('/signup',user_query.signup)
+router.post('/signup',  async (ctx) =>{
+    
+	try {
+	  const {name,email,password,phone} = ctx.request.body;
+	  const hash = await bcrypt.hash(password,10);
+  
+	  const user = await db('user').insert({
+		name:name,
+		email:email,
+		password:hash,
+		phone:phone 
+		})
+		if(user){
+			ctx.response.status = 200;
+			ctx.body={message:"Signup Successful"} 
+			
+			
+		}
+		// const token = jwt.sign({email:email}, process.env.JWT_SECRET,{expiresIn: '30s' })
+	
+  // For duplicate entry
+	} catch  {
+		      ctx.response.status = 400;
+			  ctx.body = {      message: "User already exist"      };  
+	}  
+   }   )
+
+
+
 
 // For login
 //http://localhost:3000/users/login
-router.post('/login',user_query.login)
+router.post('/login',  async (ctx,next) =>{
+    try{
+      const {email,password,user_id} = ctx.request.body;
+      const user = await db('user').first("*").where({email:email});
+      if(user){
+        
+        const validPass = await bcrypt.compare(password, user.password);
+        if(validPass){
 
-// After login go to home page
-// http://localhost:3000/users/home
-router.get('/home', jwtauth.auth , user_query.home)
+     // Generating JWT
+     // 1- Gets us access to user
+     // 2- secret token
+     // 3- expiration date which we have not used here
+           
+          const token = jwt.sign({user_id:user.user_id}, process.env.JWT_SECRET,
+            {expiresIn: '1200s' })
+           
+           await next()
+
+          ctx.response.status = 200;
+          ctx.body={ message:"valid email and password!",token:token };
+		
+
+
+        }
+        else{
+          ctx.body={ message:"invalid password!" };
+		  ctx.response.status = 404;
+
+        }
+      }
+      else{
+        ctx.response.status = 404;
+        ctx.body={ message:"User not found!" }
+      }
+
+    }
+
+    catch (err) {
+          ctx.response.status = 500;
+          ctx.body = {      message: err.message      };  
+      }  
+ 
+ })
+
+
+
+
+
 
 
 // To get data with specific id  
-router.get('/:user_id', isValidId, user_query.getById);
+router.get('/:user_id', isValidId, async (ctx) =>{
+	const {user_id} = ctx.params;
+		try {
+			await db('user').where({user_id}).select().then((data)=>{  
+			       ctx.response.status = 200;
+             ctx.body={ json: data }
+		  })
+		}
+		   catch (err) {
+			ctx.response.status = 500;
+			ctx.body = {      message: err.message       };  
+		}
+});
 
 
 // // To post data in the table
@@ -43,11 +257,49 @@ router.get('/:user_id', isValidId, user_query.getById);
   
   
 // To delete data from the table with specific id
-router.delete('/:user_id', isValidId,user_query.deleteData);
+router.delete('/:user_id', isValidId, async (ctx) =>{
+	const {user_id} = ctx.params;
+	try {
+	  const count = await db('user').where({user_id}).del();
+	    if (!count) {
+		    ctx.response.status = 404;
+			ctx.body={ message: "Record not found"}
+		     
+	  } else {
+		    ctx.response.status = 200;
+			ctx.body={message:"Data successfully deleted"} 
+	  }  
+	}
+	catch (err) {
+		ctx.response.status = 500;
+		ctx.body = {      message: err.message       }; 		
+	}
+});
 
 
 // To update data
-router.put('/:user_id', isValidId,user_query.updateData );
+router.put('/:user_id', isValidId, async (ctx) =>{
+    const {user_id} = ctx.params;
+    const changes = ctx.request.body;
+    try {
+      const count = await db('user').where({user_id}).update(changes);
+        if (!count) {
+			ctx.response.status = 404;
+			ctx.body={ message: "Record not found"}	
+        
+      } else {
+        await db('user').select('*').where("user_id",user_id).then((data)=>{
+			ctx.response.status = 201;
+			ctx.body={json:data} 
+         
+        });
+      }
+    } 
+    catch (err) {
+		ctx.response.status = 500;
+		ctx.body = {      message: err.message       }; 	
+    }
+  } );
   
 
 module.exports = router;
@@ -55,4 +307,22 @@ module.exports = router;
 
 
 
+// After login go to home page
+// http://localhost:3000/users/home
+// router.get('/home', headerauth ,async (ctx) =>{
 
+// 	try{
+//         if(!ctx.user){
+// 			ctx.response.status = 403;
+// 		    ctx.body = {      message: "You donot have access"    }; 
+            
+//         }else{
+// 			 ctx.response.status = 200;
+// 			ctx.body = {      message: "This is home page" ,  user:ctx.user.user_id    }; 
+		
+//         }
+//     }catch(error){
+//         ctx.response.status = 500;
+// 		ctx.body = {      message: error.message   }; 
+//     }
+//    })

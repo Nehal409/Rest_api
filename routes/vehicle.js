@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const Koa = require("koa");
 const vehicle_query = require("../repositry/vehicle_repo")
+const search = require("../repositry/searchbar");
 
 const app = new Koa();
 
@@ -16,7 +17,11 @@ function isValidId(ctx, next) {
 
   
 // To get data   
-router.get('/',vehicle_query.getAll)
+// router.get('/',vehicle_query.getAll)
+
+
+// For search Bar
+// router.get('/search/', search.searchvehicle)
 
 
 

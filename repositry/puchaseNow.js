@@ -1,7 +1,7 @@
 const db = require("../db/database");
 require("dotenv").config()
 
-
+// Purchse details on order now webpage
 exports.purchaseDetails =  async (ctx) =>{
 	const {item_id} = ctx.params;
 		try {
@@ -21,23 +21,23 @@ exports.purchaseDetails =  async (ctx) =>{
 
 
 // Purchas now form details
-exports.checkUser =  async (ctx,next) =>{
-	const token = jwt.sign({email:email,user_id:user_id}, process.env.JWT_SECRET,
-		{expiresIn: '1200s' })
+// exports.checkUser =  async (ctx,next) =>{
+// 	const token = jwt.sign({email:email,user_id:user_id}, process.env.JWT_SECRET,
+// 		{expiresIn: '1200s' })
 
-		if(token){
-			 jwt.verify(token,process.env.JWT_SECRET,(err)=>{
-				if(err){
-					ctx.response.status = 404;
-			         ctx.body = {      message: err.message       };  
-				}else{
+// 		if(token){
+// 			 jwt.verify(token,process.env.JWT_SECRET,(err)=>{
+// 				if(err){
+// 					ctx.response.status = 404;
+// 			         ctx.body = {      message: err.message       };  
+// 				}else{
 					
-				}
-			 })
+// 				}
+// 			 })
 			  
 			
-		}
-		else{
+// 		}
+// 		else{
 
-		}
-}
+// 		}
+// }

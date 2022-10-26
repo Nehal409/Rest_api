@@ -1,189 +1,88 @@
-require("dotenv").config()
+
+// JWT auth
+        // const token = ctx.headers.authorization.split(' ');
+        // // use bearer when using jwt in header
+        // // It means first part of header must be Bearer and second part must be a valid token
+        // if(token[0]=== 'Bearer' && jwt.verify(token[1],process.env.JWT_SECRET)){
+        //   next()
+        // }
+        // const value = jwt.decode(token)
+        // console.log(value);
 
 
-const db = require("../db/database");
-const bcrypt = require("bcrypt");
-const Koa = require("koa");
-const json = require("koa-json");
-const koaBody = require('koa-body');
-const jwt = require("jsonwebtoken");
+//  router.post('/posts', verifyToken, (req, res) => {  
+//   jwt.verify(req.token, 'secretkey', (err, authData) => {
+//     if(err) {
+//       res.sendStatus(403);
+//     } else {
+//       res.json({
+//         message: 'Post created...',
+//         authData
+//       });
+//     }
+//   });
+// });
 
+// router.post('/login', (req, res) => {
+//   // Mock user
+//   const user = {
+//     id: 1, 
+//     username: 'brads',
+//     email: 'brad@gmail.com'
+//   }
 
-const app = new Koa();
+//   jwt.sign({user}, 'secretkey', { expiresIn: '3000s' }, (err, token) => {
+//     res.json({
+//       token
+//     });
+//   });
+// });
 
-// middleware functions
-app.use(koaBody());
-app.use(json());
+// // FORMAT OF TOKEN
+// // Authorization: Bearer <access_token>
 
+// // Verify Token
+// function verifyToken(req, res, next) {
+//   // Get auth header value
+//   const bearerHeader = req.headers['authorization'];
+//   // Check if bearer is undefined
+//   if(typeof bearerHeader !== 'undefined') {
+//     // Split at the space
+//     const bearer = bearerHeader.split(' ');
+//     // Get token from array
+//     const bearerToken = bearer[1];
+//     // Set the token
+//     req.token = bearerToken;
+//     // Next middleware
+//     next();
+//   } else {
+//     // Forbidden
+//     res.sendStatus(403);
+//   }
 
-
-
-exports.getAll = async (ctx) => {
-    try {
-       await db('user').select().then((data)=>{
-       ctx.response.status = 200;
-        ctx.body={ json: data }
-	})
-    } 
-    catch (err) {
-        ctx.response.status = 500;
-        ctx.body = {      message: err.message       };  
-                }
-}
-
-
- 
-exports.signup = async (ctx) =>{
-    
-  try {
-    const {name,email,password,phone} = ctx.request.body;
-    const hash = await bcrypt.hash(password,10);
-
-    await db('user').insert({
-      name:name,
-      email:email,
-      password:hash,
-      phone:phone 
-      })
-      // const token = jwt.sign({email:email}, process.env.JWT_SECRET,{expiresIn: '30s' })
-      ctx.response.status = 200;
-      ctx.body={message:"Signup Successful"} 
-      
-// For duplicate entry
-  } catch (err) {
-      ctx.response.status = 400;
-			ctx.body = {      message: "User already exist"      };  
-  }  
- }   
-
-
-
-
- exports.login = async (ctx) =>{
-    try{
-      const {email,password,user_id} = ctx.request.body;
-      const user = await db('user').first("*").where({email:email});
-      if(user){
-        const validPass = await bcrypt.compare(password, user.password);
-        if(validPass){
-
-     // Generating JWT
-     // 1- Gets us access to user
-     // 2- secret token
-     // 3- expiration date which we have not used here
-          const token = jwt.sign({email:email,user_id:user_id}, process.env.JWT_SECRET,
-            {expiresIn: '1200s' })
-
-          ctx.response.status = 200;
-          ctx.body={ message:"valid email and password!",token:token };
-        }
-        else{
-          ctx.body={ message:"invalid password!" };
-
-        }
-      }
-      else{
-        ctx.response.status = 404;
-        ctx.body={ message:"User not found!" }
-      }
-    }
-    catch (err) {
-          ctx.response.status = 500;
-          ctx.body = {      message: err.message      };  
-      }  
- 
- }
-
-
- 
-
- exports.home = async (ctx) =>{
-  ctx.body={ message:"Thid is home page" }
- }
-
-
-
-
-exports.getById = async (ctx) =>{
-	const {user_id} = ctx.params;
-		try {
-			await db('user').where({user_id}).select().then((data)=>{  
-			       ctx.response.status = 200;
-             ctx.body={ json: data }
-		  })
-		}
-		   catch (err) {
-			ctx.response.status = 500;
-			ctx.body = {      message: err.message       };  
-		}
-}
-
-
-
-
-
-// exports.postdata = async (ctx) =>{
-
-//     const postData = ctx.request.body;
-//     try {
-//       await db('user').insert(postData).then(()=>{  
-//         ctx.response.status = 200;
-//         ctx.body={ json: postData }
-//      })  
-//     } catch (err) {
-//         ctx.response.status = 500;
-//         ctx.body = {      message: err.message       }; 		} 
 // }
 
 
 
 
+//  function decode(){
+  
+//   console.log(decode)
+//   const value = jwt.decode(token)
+//   ctx.body = {      message: value    };  
+// }
 
-exports.deleteData =  async (ctx) =>{
-	const {user_id} = ctx.params;
-	try {
-	  const count = await db('user').where({user_id}).del();
-	    if (!count) {
-		    ctx.response.status = 404;
-			ctx.body={ message: "Record not found"}
-		     
-	  } else {
-		    ctx.response.status = 200;
-			ctx.body={message:"Data successfully deleted"} 
-	  }  
-	}
-	catch (err) {
-		ctx.response.status = 500;
-		ctx.body = {      message: err.message       }; 		
-	}
-}
+
+ 
+
+
+  
 
 
 
 
 
-exports.updateData = async (ctx) =>{
-    const {user_id} = ctx.params;
-    const changes = ctx.request.body;
-    try {
-      const count = await db('user').where({user_id}).update(changes);
-        if (!count) {
-			ctx.response.status = 404;
-			ctx.body={ message: "Record not found"}	
-        
-      } else {
-        await db('user').select('*').where("user_id",user_id).then((data)=>{
-			ctx.response.status = 201;
-			ctx.body={json:data} 
-         
-        });
-      }
-    } 
-    catch (err) {
-		ctx.response.status = 500;
-		ctx.body = {      message: err.message       }; 	
-    }
-  }
+
 
 
 

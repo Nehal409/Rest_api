@@ -2,26 +2,26 @@
 
 const db = require("../db/database");
 
-exports.getAll = async (ctx) => {
+// exports.getAll = async (ctx) => {
     
-    try {
-        await db('vehicle').select().then((data)=>{
-        ctx.response.status = 200;
-         ctx.body={ json: data }
-     })
-     } 
-     catch (err) {
-         ctx.response.status = 500;
-         ctx.body = {      message: err.message       };  
-                 }
+//     try {
+//         await db('vehicle').select().then((data)=>{
+//         ctx.response.status = 200;
+//          ctx.body={ json: data }
+//      })
+//      } 
+//      catch (err) {
+//          ctx.response.status = 500;
+//          ctx.body = {      message: err.message       };  
+//                  }
      
-    };
+//     };
 
 
 exports.getById = async (ctx) =>{
 	const {id} = ctx.params;
 		try {
-			await db('vehicle').where({id}).select().then((data)=>{  
+			await db('vehicle').where({id}).select("name","Price","img_url").then((data)=>{  
 			 ctx.response.status = 200;
              ctx.body={ json: data }
 		  })
