@@ -15,12 +15,19 @@ const Koa = require("koa");
 const json = require("koa-json");
 const koaBody = require('koa-body');
 const jwt = require("jsonwebtoken");
+var bodyParser = require('koa-bodyparser');
+const cors = require('@koa/cors');
+
+
+
+
 
 
 const app = new Koa();
-
+app.use(bodyParser());
 // middleware functions
 app.use(koaBody());
+app.use(cors());
 app.use(json());
 
 
@@ -35,7 +42,7 @@ function isValidId(ctx, next) {
   }
 
 
-function  headerauth (ctx,next){  
+async function  headerauth (ctx,next){  
 // access the authorization header
 const authHeader = ctx.get('Authorization');
 const token = authHeader && authHeader.split(' ')[1];    
@@ -53,7 +60,7 @@ jwt.verify(token, process.env.JWT_SECRET, (error, user) =>{
 	}
 
 	//if the user is verified get user id
-	ctx.user = user.user_id;
+	ctx.user = user;
 	next(); //move on
 });
 
@@ -98,28 +105,29 @@ async function getDetails (ctx,next){
 		}
 }
 
-//
-router.post('/completeOrder/:item_id', getDetails, headerauth, async (ctx) =>{
+ // headerauth
+router.post('/completeOrder/:item_id', getDetails,  async (ctx) =>{
 	try{
 		const {method} = ctx.request.body;
-        if(!ctx.user){
-			ctx.response.status = 403;
-		    ctx.body = {      message: "You donot have access"    }; 
+        // if(!ctx.user){
+		// 	ctx.response.status = 403;
+		//     ctx.body = {      message: "You donot have access"    }; 
             
-        }else{
+        // }else{
 			 await db('receipt').insert({
 				unit_price:ctx.data[0].Price,
 				method:method,
 				dealer_id:ctx.data[0].dealer_id,
 				inventory_id:ctx.data[0].item_id,
-				user_id:ctx.user
-				}).then(()=>{
+				// user_id:ctx.user.user_id
+				})
+				.then((data)=>{
 					ctx.response.status = 200;
-					ctx.body = { message: "Order has been completed"}
+					ctx.body = { message: data}
 				})
 			//  ctx.body = {      message: "This is home page" ,  
 			//  user:ctx.user.user_id, message: ctx.data[0]  }; 		
-        }
+      //  }
     }catch(error){
         ctx.response.status = 500;
 		ctx.body = {      message: error.message   }; 
@@ -127,7 +135,38 @@ router.post('/completeOrder/:item_id', getDetails, headerauth, async (ctx) =>{
 })
 
 
+// To get data with specific id  in  vehicle specs and features
+router.get('/inventory/:item_id',async (ctx) =>{
+	const {item_id} = ctx.params;
+	try{
+		
 
+        // if(!ctx.user){
+		// 	ctx.response.status = 403;
+		//     ctx.body = {      message: "You donot have access"    }; 
+            
+        // }else{
+		
+			await db('inventory as i')
+            .innerJoin('vehicle as v', 'v.id', 'i.id')
+			.innerJoin('dealer as d', 'd.dealer_id', 'i.dealer_id')
+            .select('v.make', 'v.model','v.name','v.status',
+			'v.engine_type','v.engine_capacity','v.img_url',
+			'v.transmission','i.color','i.mileage','d.company_name')
+            .where({item_id})
+			.then((data)=>{  
+			// console.log(data);
+			 ctx.response.status = 200;
+             ctx.body={ json: data }
+			})
+	//	}			 	
+        
+    }catch(error){
+        ctx.response.status = 500;
+		ctx.body = {      message: error.message   }; 
+    }	
+})
+		
 
 
 

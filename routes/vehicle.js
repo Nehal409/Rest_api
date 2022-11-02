@@ -16,8 +16,8 @@ function isValidId(ctx, next) {
   }
 
   
-// To get data   
-// router.get('/',vehicle_query.getAll)
+// To get all cars    
+router.get('/',vehicle_query.getallcars)
 
 
 // For search Bar

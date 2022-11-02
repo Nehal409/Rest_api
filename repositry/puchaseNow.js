@@ -7,7 +7,7 @@ exports.purchaseDetails =  async (ctx) =>{
 		try {
 			 await db('inventory as i')
             .innerJoin('vehicle as v', 'v.id', 'i.id')
-            .select('v.name','v.status','v.img_url','v.Price','i.color')
+            .select('v.name','i.statuss','v.img_url','v.Price','i.color')
             .where({item_id}).then((data)=>{  
 			 ctx.response.status = 200;
              ctx.body={ json: data }

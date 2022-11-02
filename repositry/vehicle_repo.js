@@ -18,6 +18,22 @@ const db = require("../db/database");
 //     };
 
 
+// cars.html all cars
+exports.getallcars =   async (ctx) => { 
+	try {
+	
+		await db('vehicle').select("name","Price","img_url").then((data)=>{
+		ctx.response.status = 200;
+		 ctx.body={ json: data }
+		//  console.log(data)
+	 })
+	 } 
+	 catch (err) {
+		 ctx.response.status = 500;
+		 ctx.body = {      message: err.message       };  
+				 }
+				}
+
 exports.getById = async (ctx) =>{
 	const {id} = ctx.params;
 		try {
