@@ -2,22 +2,22 @@ const db = require("../db/database");
 require("dotenv").config()
 
 // Purchse details on order now webpage
-exports.purchaseDetails =  async (ctx) =>{
-	const {item_id} = ctx.params;
-		try {
-			 await db('inventory as i')
-            .innerJoin('vehicle as v', 'v.id', 'i.id')
-            .select('v.name','i.statuss','v.img_url','v.Price','i.color')
-            .where({item_id}).then((data)=>{  
-			 ctx.response.status = 200;
-             ctx.body={ json: data }
-		  })
-		}
-		   catch (err) {
-			ctx.response.status = 500;
-			ctx.body = {      message: err.message       };  
-		}
-}
+// exports.purchaseDetails =  async (ctx) =>{
+// 	const {item_id} = ctx.params;
+// 		try {
+// 			 await db('inventory as i')
+//             .innerJoin('vehicle as v', 'v.id', 'i.id')
+//             .select('v.name','i.statuss','v.img_url','v.Price','i.color')
+//             .where({item_id}).then((data)=>{  
+// 			 ctx.response.status = 200;
+//              ctx.body={ json: data }
+// 		  })
+// 		}
+// 		   catch (err) {
+// 			ctx.response.status = 500;
+// 			ctx.body = {      message: err.message       };  
+// 		}
+// }
 
 
 // Purchas now form details

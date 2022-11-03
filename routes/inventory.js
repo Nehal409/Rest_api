@@ -50,7 +50,7 @@ router.get('/home',homePagination_query.homePage)
 
 
 // For purchase now page details
-router.get('/purchases/:item_id',purchaseNow.purchaseDetails)
+// router.get('/purchases/:item_id',purchaseNow.purchaseDetails)
 
 
 // To get data   

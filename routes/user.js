@@ -42,7 +42,8 @@ function isValidId(ctx, next) {
   }
 
 
-async function  headerauth (ctx,next){  
+async function  headerauth (ctx,next){ 
+	try {	
 // access the authorization header
 const authHeader = ctx.get('Authorization');
 const token = authHeader && authHeader.split(' ')[1];    
@@ -51,36 +52,34 @@ if(token === null || typeof(token) === "undefined"){
 	 ctx.response.status = 401;
 	 ctx.body = {      message: "Unauthorized Access"   }; 
 }
-
 //if token is not null then
-jwt.verify(token, process.env.JWT_SECRET, (error, user) =>{
-	if(error) {
-		ctx.response.status = 403;
-		ctx.body = {      message: "Forbidden Access:Token Expired"   }; 
-	}
-
-	//if the user is verified get user id
-	ctx.user = user;
-	next(); //move on
-});
+	const decoded = jwt.verify(token, process.env.JWT_SECRET)
+	ctx.user = decoded.user_id
+	console.log(ctx.user);
+		await next()
+} 
+catch(err){
+			ctx.response.status = 401;
+		    ctx.body = {      message: "you don't have access"   }; 
 
 }
-// home page
-router.get('/vehicles',   async (ctx) => { 
-try {
-	const limit = parseInt(ctx.query.limit)
-	await db('vehicle').select("name","Price","img_url").limit(limit).then((data)=>{
-	ctx.response.status = 200;
-	 ctx.body={ json: data }
-	//  console.log(data)
- })
- } 
- catch (err) {
-	 ctx.response.status = 500;
-	 ctx.body = {      message: err.message       };  
-			 }
-			})
-
+}
+router.get('/purchases/:item_id', headerauth, async (ctx) =>{
+	const {item_id} = ctx.params;
+		try {
+			 await db('inventory as i')
+            .innerJoin('vehicle as v', 'v.id', 'i.id')
+            .select('v.name','i.statuss','v.img_url','v.Price','i.color')
+            .where({item_id}).then((data)=>{  
+			 ctx.response.status = 200;
+             ctx.body={ json: data }
+		  })
+		}
+		   catch (err) {
+			ctx.response.status = 500;
+			ctx.body = {      message: err.message       };  
+		}
+})
 
 			
 
@@ -105,48 +104,33 @@ async function getDetails (ctx,next){
 		}
 }
 
- // headerauth
-router.post('/completeOrder/:item_id', getDetails,  async (ctx) =>{
+router.post('/completeOrder/:item_id', getDetails, headerauth, async (ctx) =>{
 	try{
-		const {method} = ctx.request.body;
-        // if(!ctx.user){
-		// 	ctx.response.status = 403;
-		//     ctx.body = {      message: "You donot have access"    }; 
-            
-        // }else{
+		const {method} = ctx.request.body; 
+		   
 			 await db('receipt').insert({
 				unit_price:ctx.data[0].Price,
 				method:method,
 				dealer_id:ctx.data[0].dealer_id,
 				inventory_id:ctx.data[0].item_id,
-				// user_id:ctx.user.user_id
+				user_id:ctx.user
 				})
 				.then((data)=>{
 					ctx.response.status = 200;
 					ctx.body = { message: data}
 				})
-			//  ctx.body = {      message: "This is home page" ,  
-			//  user:ctx.user.user_id, message: ctx.data[0]  }; 		
-      //  }
-    }catch(error){
-        ctx.response.status = 500;
-		ctx.body = {      message: error.message   }; 
-    }	
+
+	}catch(error){
+					ctx.response.status = 500;
+					ctx.body = {      message: error.message   }; 
+				 }	
 })
 
 
 // To get data with specific id  in  vehicle specs and features
-router.get('/inventory/:item_id',async (ctx) =>{
+router.get('/inventory/:item_id',headerauth ,async (ctx) =>{
 	const {item_id} = ctx.params;
 	try{
-		
-
-        // if(!ctx.user){
-		// 	ctx.response.status = 403;
-		//     ctx.body = {      message: "You donot have access"    }; 
-            
-        // }else{
-		
 			await db('inventory as i')
             .innerJoin('vehicle as v', 'v.id', 'i.id')
 			.innerJoin('dealer as d', 'd.dealer_id', 'i.dealer_id')
@@ -155,17 +139,34 @@ router.get('/inventory/:item_id',async (ctx) =>{
 			'v.transmission','i.color','i.mileage','d.company_name')
             .where({item_id})
 			.then((data)=>{  
-			// console.log(data);
+			console.log("inventory",data);
 			 ctx.response.status = 200;
              ctx.body={ json: data }
 			})
-	//	}			 	
+					 	
         
     }catch(error){
         ctx.response.status = 500;
 		ctx.body = {      message: error.message   }; 
     }	
 })
+
+
+// home page
+router.get('/vehicles',   async (ctx) => { 
+	try {
+		const limit = parseInt(ctx.query.limit)
+		 await db('vehicle').select("name","Price","img_url","id").limit(limit).then((data)=>{
+		ctx.response.status = 200;
+		 ctx.body={  data }
+		//  console.log(data)
+	 })
+	 } 
+	 catch (err) {
+		 ctx.response.status = 500;
+		 ctx.body = {      message: err.message       };  
+				 }
+				})
 		
 
 
