@@ -55,7 +55,6 @@ if(token === null || typeof(token) === "undefined"){
 //if token is not null then
 	const decoded = jwt.verify(token, process.env.JWT_SECRET)
 	ctx.user = decoded.user_id
-	console.log(ctx.user);
 		await next()
 } 
 catch(err){
@@ -104,6 +103,8 @@ async function getDetails (ctx,next){
 		}
 }
 
+
+// Purchase now api with radio button 
 router.post('/completeOrder/:item_id', getDetails, headerauth, async (ctx) =>{
 	try{
 		const {method} = ctx.request.body; 
@@ -136,10 +137,9 @@ router.get('/inventory/:item_id',headerauth ,async (ctx) =>{
 			.innerJoin('dealer as d', 'd.dealer_id', 'i.dealer_id')
             .select('v.make', 'v.model','v.name','v.status',
 			'v.engine_type','v.engine_capacity','v.img_url',
-			'v.transmission','i.color','i.mileage','d.company_name')
+			'v.transmission','i.color','i.mileage','i.item_id','d.company_name')
             .where({item_id})
 			.then((data)=>{  
-			console.log("inventory",data);
 			 ctx.response.status = 200;
              ctx.body={ json: data }
 			})
@@ -152,21 +152,7 @@ router.get('/inventory/:item_id',headerauth ,async (ctx) =>{
 })
 
 
-// home page
-router.get('/vehicles',   async (ctx) => { 
-	try {
-		const limit = parseInt(ctx.query.limit)
-		 await db('vehicle').select("name","Price","img_url","id").limit(limit).then((data)=>{
-		ctx.response.status = 200;
-		 ctx.body={  data }
-		//  console.log(data)
-	 })
-	 } 
-	 catch (err) {
-		 ctx.response.status = 500;
-		 ctx.body = {      message: err.message       };  
-				 }
-				})
+
 		
 
 

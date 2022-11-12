@@ -2,30 +2,16 @@
 
 const db = require("../db/database");
 
-// exports.getAll = async (ctx) => {
-    
-//     try {
-//         await db('vehicle').select().then((data)=>{
-//         ctx.response.status = 200;
-//          ctx.body={ json: data }
-//      })
-//      } 
-//      catch (err) {
-//          ctx.response.status = 500;
-//          ctx.body = {      message: err.message       };  
-//                  }
-     
-//     };
 
-
-// cars.html all cars
+// cars page and home page all cars
 exports.getallcars =   async (ctx) => { 
 	try {
-	
-		await db('vehicle').select("name","Price","img_url").then((data)=>{
+		const limit = parseInt(ctx.query.limit)
+		await db('inventory as i')
+            .innerJoin('vehicle as v', 'v.id', 'i.id')
+            .select('v.name', 'v.Price','v.img_url','v.id','i.item_id').limit(limit).then((data)=>{
 		ctx.response.status = 200;
 		 ctx.body={ json: data }
-		//  console.log(data)
 	 })
 	 } 
 	 catch (err) {
@@ -33,6 +19,9 @@ exports.getallcars =   async (ctx) => {
 		 ctx.body = {      message: err.message       };  
 				 }
 				}
+
+
+
 
 exports.getById = async (ctx) =>{
 	const {id} = ctx.params;
