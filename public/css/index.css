@@ -1,77 +1,80 @@
 * {
-	box-sizing: border-box;
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 body {
-	font-family: 'Montserrat', sans-serif;
-	line-height: 1.6;
-	margin: 0;
-	min-height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    min-height: 100vh;
     background-color: #edf0f1;
 }
 
 /* Styling for Header */
 .header ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 .header a {
-	text-decoration: none;
+    text-decoration: none;
 }
 .logo {
-	margin: 0;
-	font-size: 1.5em;    
+    margin: 0;
+    font-size: 1.5em;
 }
-.logo a{
-    color: #FFAC1C;
+.logo a {
+    color: #ffac1c;
 }
 .logo a:hover {
-	color: #edf0f1;
+    color: #edf0f1;
 }
-.nav-links{
-	margin-top: 5px;
+.nav-links {
+    margin-top: 5px;
 }
 .logo a,
 .nav-links a {
-	padding-top: 7px;
-    
+    padding-top: 7px;
+
     padding-bottom: 7px;
     padding-right: 15px;
     padding-left: 15px;
-	text-transform: uppercase;
-	text-align: center;
-	display: block;
+    text-transform: uppercase;
+    text-align: center;
+    display: block;
 }
-.header .nav-links{
+.header .nav-links {
     margin-top: 5px;
 }
 .nav-links a {
-	color:#edf0f1;
-	font-size: .99em;
+    color: #edf0f1;
+    font-size: 0.99em;
 }
 .nav-links a:hover {
-	color: #FFAC1C;
+    color: #ffac1c;
 }
 .header {
-	padding-top: .10em;
-	padding-bottom: .10em;
-	background-color: #101010;	
-    position: fixed; top: 0; left: 0; z-index: 9999;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    background-color: #101010;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
     display: flex;
     flex-direction: column;
-    align-items: center;	
+    align-items: center;
     width: 80%;
     margin: 0 auto;
     width: 100%;
 }
-.search input[type=text]{
-    width:300px;
-    height:27px;
+.search input[type='text'] {
+    width: 300px;
+    height: 27px;
     border-radius: 5px;
 }
-.search button{
+.search button {
     background-color: #101010;
     color: #edf0f1;
     float: right;
@@ -83,51 +86,44 @@ body {
     transition: all 0.6s ease;
 }
 .search button:hover {
-	color: #FFAC1C;
-  
+    color: #ffac1c;
 }
 
 /*Responsive for Header*/
 
 @media (min-width: 769px) {
-	.header,
-	.nav-links {
-		display: flex;
-	}
-	.header {
-		flex-direction: column;
-		align-items: center;
-         	}
- 	.header{
-		width: 80%;
-		margin: 0 auto;
-		width: 100%;
-    	   }
+    .header,
+    .nav-links {
+        display: flex;
+    }
+    .header {
+        flex-direction: column;
+        align-items: center;
+    }
+    .header {
+        width: 80%;
+        margin: 0 auto;
+        width: 100%;
+    }
 }
 @media (min-width: 1025px) {
-	.header {
-		flex-direction: row;
-		justify-content: space-between;
-	}
+    .header {
+        flex-direction: row;
+        justify-content: space-between;
+    }
 }
-
-
-
 
 /* pic under header     */
 .add {
-width: 100%; 
-height: 350px;  
-padding: 40px 2px;
-margin: 0;
-
-
-
-}   
-.car1{
+    width: 100%;
+    height: 350px;
+    padding: 40px 2px;
+    margin: 0;
+}
+.car1 {
     height: 100%;
     width: 100%;
-} 
+}
 
 #table ul {
     display: inline-flex;
@@ -137,15 +133,14 @@ margin: 0;
     text-align: left;
     float: left;
     justify-content: space-around;
-    
-  }
-  #table ul li {
+}
+#table ul li {
     list-style: none;
     display: inline-block;
     padding: 10px;
-  }
-  
-#table{
+}
+
+#table {
     width: 100%;
     height: 680px;
     top: 50px;
@@ -157,93 +152,78 @@ margin: 0;
     text-decoration: none; */
 }
 
-
-
-
-
-
 /* view cars styling */
-.parent{
-width: 100%; 
-height: 500px;  
-display: flex;
-gap: 1rem;
-justify-content: space-evenly;
-align-items: center;
-
-
+.parent {
+    width: 100%;
+    height: 500px;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-evenly;
+    align-items: center;
 }
-.child1 , .child2 {
+.child1,
+.child2 {
     flex-shrink: 1;
     flex-wrap: wrap;
     height: 300px;
     position: relative;
 }
- 
 
-.child1 img{
+.child1 img {
     width: 390px;
     height: 100%;
 }
 
-.child2 img{
+.child2 img {
     width: 819px;
     height: 100%;
-    
 }
 
-.parent-2{
-    width: 100%; 
-    height: 350px;  
+.parent-2 {
+    width: 100%;
+    height: 350px;
     margin-top: -20px;
     display: flex;
     gap: 1rem;
     justify-content: space-evenly;
     align-items: center;
     transition: all 0.6s ease;
-    
-    
-    }
-    .child-3 , .child-4 {
-       
-        flex-shrink: 1;
-        flex-wrap: wrap;
-        height: 300px;
-        position: relative;
-        
-    }
-    .child-3 img{
-        width: 390px;
-        height: 100%;
-    }
-    
-    .child-4 img{
-        width: 819px;
-        height: 100%;
-    }
+}
+.child-3,
+.child-4 {
+    flex-shrink: 1;
+    flex-wrap: wrap;
+    height: 300px;
+    position: relative;
+}
+.child-3 img {
+    width: 390px;
+    height: 100%;
+}
 
+.child-4 img {
+    width: 819px;
+    height: 100%;
+}
 
-    
 /* Text on image */
-.child1-text{
+.child1-text {
     position: absolute;
     top: 63%;
     color: #edf0f1;
     padding: 20px;
-    
 }
-.child1-text h4{
+.child1-text h4 {
     text-transform: capitalize;
     font-size: 2rem;
 }
-.child1-text p{
+.child1-text p {
     font-size: 20px;
 }
 
-
 /* view car button */
 
-.view-div{
+.view-div {
     width: 100%;
     height: 90px;
     right: 10px;
@@ -251,9 +231,8 @@ align-items: center;
     position: relative;
     top: -30px;
     transition: all 0.6s ease;
-
 }
-.view-btn{
+.view-btn {
     float: right;
     font-size: 20px;
     width: 150px;
@@ -265,21 +244,19 @@ align-items: center;
     display: flex;
     align-items: center;
     justify-content: center;
-   
 }
-.view-div a:hover{
-    color: #FFAC1C;
-    
+.view-div a:hover {
+    color: #ffac1c;
 }
 
 /* hover text on picture */
-.hover-text-div{
+.hover-text-div {
     position: absolute;
     top: 0;
     text-decoration: none;
-   font-size: 3em;
-   font-weight: bold;
-   color: #FFAC1C;
+    font-size: 3em;
+    font-weight: bold;
+    color: #ffac1c;
     width: 100%;
     height: 100%;
     display: flex;
@@ -289,19 +266,17 @@ align-items: center;
     background: rgba(0, 0, 0, 0.6);
     transition: opacity 0.3s;
 }
- .hover-text-div:hover{
+.hover-text-div:hover {
     opacity: 1;
 }
-.hover-text-div a{
+.hover-text-div a {
     text-decoration: none;
-    color: #FFAC1C;
+    color: #ffac1c;
 }
-
-
 
 /*Styling for Footer*/
 
-.footer{
+.footer {
     background-color: #101010;
     padding: 70px 0;
     position: block;
@@ -310,50 +285,50 @@ align-items: center;
     height: 280px;
 }
 
-.container{
+.container {
     margin: auto;
-    
+
     max-width: 1170px;
 }
-.footer ul{
+.footer ul {
     list-style: none;
 }
-.footer img{
+.footer img {
     width: 130px;
     height: 70px;
-   
 }
 
-.row{
+.row {
     display: flex;
     flex-wrap: wrap;
 }
-.footer-col{
+.footer-col {
     width: 25%;
     padding: 0 15px;
 }
-.footer-col h4{
-
+.footer-col h4 {
     font-size: 18px;
-    color: #FFAC1C;
+    color: #ffac1c;
     text-transform: capitalize;
     margin-bottom: 20px;
 }
-.footer-col ul,li{
+.footer-col ul,
+li {
     margin-bottom: 10px;
 }
-.footer a,ul,
-li{
+.footer a,
+ul,
+li {
     text-decoration: none;
     color: #edf0f1;
     font-weight: 3000;
     transition: all 0.3s ease;
 }
-.footer a:hover{
-    color: #FFAC1C;
+.footer a:hover {
+    color: #ffac1c;
     padding-left: 5px;
 }
- .social-links i{
+.social-links i {
     display: inline-block;
     height: 40px;
     width: 40px;
@@ -363,35 +338,26 @@ li{
     line-height: 40px;
     border-radius: 50px;
     transition: all 0.6s ease;
-
 }
-.footer-col .social-links i:hover{
-    color: #FFAC1C;
-    
+.footer-col .social-links i:hover {
+    color: #ffac1c;
 }
-.contact i{
+.contact i {
     padding-right: 10px;
 }
-
 
 /*Responsive for Footer*/
 
 @media (max-width: 769px) {
-     
-        .footer-col{
-            width: 50%;
-            margin-bottom: 30px;
-        
-        }
-    
+    .footer-col {
+        width: 50%;
+        margin-bottom: 30px;
+    }
 }
 
 @media (max-width: 574px) {
-     
-    .footer-col{
+    .footer-col {
         width: 100%;
         background-color: #101010;
-    } }
-
-
-
+    }
+}
